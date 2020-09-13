@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Etch-a-Sketch</title>
+  <style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+
+    
+    #bg-image {
+        background-color: #8BC6EC;
+        background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        z-index: -1;
+        background-size: cover;
+      }
+
+    body {
+        font-family: "Roboto", Arial, Helvetica, sans-serif;
+    }
+    :root {
+    --grid-cols: 1;
+    --grid-rows: 1;
+    }
+
+    #parent {
+    display: grid;
+    grid-template-rows: repeat(var(--grid-rows), 1fr);
+    grid-template-columns: repeat(var(--grid-cols), 1fr);
+    width: 40vw;
+    height: 40vw;
+    margin: auto;
+    padding: 20px;
+    }
+
+    .grid-item {
+        border: 1px solid #ffffff75;
+        text-align: center;
+    }
+
+    button {
+        margin: 10px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    main {
+        text-align: center;
+        background-color: #4e538ac4;
+        width: 50vw;
+        margin: auto;
+        border-radius: 10px;
+    }
+
+    h1 {
+        padding: 5px;
+        margin: 5px;
+        margin-top: 10px;
+        text-align: center;
+        color: #af0051;
+    }
+
+  </style>
+</head>
+<body>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <div id="bg-image"></div>
+    
+        <h1>Etch-a-Sketch</h1>
+    <main>
+        <div id="parent"></div>
+        <button>Reset drawing</button>
+    </main>
+    <script>
+        const parent = document.querySelector("#parent");
+        makeGrid(16, 16);
+
+        function makeGrid(rows, cols) {
+            parent.style.setProperty('--grid-rows', rows);
+            parent.style.setProperty('--grid-cols', cols);
+            for (let c = 0; c < (rows * cols); c++) {
+                let cell = document.createElement("div");
+                parent.appendChild(cell).className = "grid-item";
+                cell.addEventListener("mouseover", changeColor)//Event listener hover on div
+            };
+        };
+
+
+        function changeColor(e) { //Grid divs change color (add class or style background color)
+            const squareColor = e.target.style.backgroundColor;
+            if (squareColor) {
+                let matches = squareColor.match(/[0-9]{1,3}/g)
+                // Use .map function to cycle through the array and replace each number with a lower number [I chose 80% of the original number], which will eventually turn the div black (i.e. will get close enough to RGB 0,0,0 to appear black)
+                let newRGB = matches.map(function (item) {
+                    return item * .8
+                })
+                e.target.style.backgroundColor = "rgb(" + newRGB[0] + ", " + newRGB[1] + ", " + newRGB[2] + ")"
+                return;
+            }
+            e.target.style.backgroundColor = random_rgb();
+        }
+
+        function random_rgb() {
+            let o = Math.round, r = Math.random, s = 255;
+            return `rgb(${o(r()*s)},${o(r()*s)},${o(r()*s)})`;
+        }
+
+        const btn = document.querySelector("button");//Button (top)
+        btn.addEventListener("click", reset)//Event listener (click)
+        function reset() {
+            let squareNumber = prompt("How many squares per side");//Popup (prompt) how many squares per side for mew grid (example 64 by 64 without chnaging pixels)
+            if (squareNumber === null) { // If user cancels prompt return
+                return;
+            }
+            squareNumber = parseInt(squareNumber)
+            if (isNaN(squareNumber) || !squareNumber) {  // If user enters string or 0 return
+                alert("That is not a valid number");
+                return;
+            }
+            const drawnSquares = document.querySelectorAll(".grid-item");
+            drawnSquares.forEach((item) => parent.removeChild(item));//clears everything (remove class)
+            makeGrid(squareNumber, squareNumber);
+        }
+    </script>
+</body>
+</html>
